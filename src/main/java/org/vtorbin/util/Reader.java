@@ -1,5 +1,7 @@
 package org.vtorbin.util;
 
+import org.vtorbin.exception.FileReadingException;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +33,10 @@ public class Reader {
                 return findById(random.nextInt(puzzles.size()));
             }
         } catch (FileNotFoundException e) {
-            System.out.println("File not found on path" + path);
+            throw new FileReadingException("File not found on path: " + path);
         } catch (IOException e) {
-            System.out.println("Error while reading from file" + e);
+           throw new FileReadingException("Error while reading from file: ", e);
         }
-        return null;
     }
 
     private String findById(int id) {
@@ -46,9 +47,9 @@ public class Reader {
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("File not found on path" + path);
+            throw new FileReadingException ("File not found on path: " + path);
         } catch (IOException e) {
-            System.out.println("Error while reading from file" + e);
+           throw new FileReadingException ("Error while reading from file: ", e);
         }
         return null;
     }

@@ -20,7 +20,7 @@ public class Parser {
     }
 
     public String parseColor() {
-        return parseFen().split(" ")[1].equals("w") ? "White" : "Black";
+        return parseFen().split(" ")[1].equals("w") ? "white" : "black";
     }
 
     public String parseSolution() {
