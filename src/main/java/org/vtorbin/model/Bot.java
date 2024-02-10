@@ -1,6 +1,7 @@
 package org.vtorbin.model;
 
 import lombok.Getter;
+import okhttp3.*;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -31,39 +32,37 @@ public class Bot extends TelegramLongPollingBot {
                 Message message = update.getMessage();
                 Chat chat = message.getChat();
                 if (message.hasText()) {
-                    //TODO: separate commands logic into other class
                     System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
                     if (message.getText().trim().startsWith("/gen")) {
-                        try {
-                            String fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR";
-                            String encodedFen = URLEncoder.encode(fen, "UTF-8");
-                            String imageUrl = "https://www.fen-to-image.com/image/" + encodedFen + ".png";
-                            String destinationFile = "downloaded_chessboard.png";
+                        String fen = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR";
+                        String encodedFen = URLEncoder.encode(fen, "UTF-8");
+                        String imageUrl = "https://fen2image.chessvision.ai/rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1?turn=black&pov=black";  // Note: Added .png extension
+                        String destinationFile = "downloaded_chessboard.png";
 
-                            URL url = new URL(imageUrl);
-                            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        OkHttpClient client = new OkHttpClient();
+                        Request request = new Request.Builder()
+                                .url(imageUrl)
+                                .build();
 
-                            try (InputStream inputStream = connection.getInputStream();
-                                 FileOutputStream outputStream = new FileOutputStream(destinationFile)) {
-
-                                byte[] buffer = new byte[1024];
-                                int bytesRead;
-                                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                                    outputStream.write(buffer, 0, bytesRead);
+                        try (Response response = client.newCall(request).execute()) {
+                            if (response.isSuccessful()) {
+                                try (ResponseBody body = response.body(); FileOutputStream outputStream = new FileOutputStream(destinationFile)) {
+                                    if (body != null) {
+                                        outputStream.write(body.bytes());
+                                    }
                                 }
-                            } finally {
-                                connection.disconnect();
+                                System.out.println("Image downloaded successfully.");
+                            } else {
+                                System.out.println("HTTP request failed with response code: " + response.code());
                             }
-
-                            System.out.println("Image downloaded successfully.");
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
+
 
                     //TODO: verify elo
 
