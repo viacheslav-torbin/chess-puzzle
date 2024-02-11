@@ -26,4 +26,9 @@ public class Parser {
     public String parseSolution() {
         return line.split(",")[MOVES_POSITION];
     }
+
+    public int parseMoveCount() {
+        int movesCount = parseSolution().split(" ").length;
+        return movesCount % 2 == 0 ? movesCount / 2 : movesCount / 2 + 1;
+    }
 }
