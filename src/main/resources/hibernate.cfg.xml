@@ -1,0 +1,9 @@
+<hibernate-configuration xmlns="http://www.hibernate.org/xsd/hibernate-configuration">
+    <session-factory>
+        <property name="hibernate.connection.username">slava</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/tabia</property>
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <mapping class="org.vtorbin.model.Puzzle"/>
+    </session-factory>
+</hibernate-configuration>
