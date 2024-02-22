@@ -2,6 +2,7 @@ package org.vtorbin.dao.impl;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.vtorbin.dao.PuzzleDao;
 import org.vtorbin.model.Puzzle;
@@ -14,21 +15,37 @@ public class PuzzleDaoImpl implements PuzzleDao {
 
     @Override
     public Puzzle add(Puzzle puzzle) {
+        Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
             session.persist(puzzle);
             return puzzle;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw e;
         }
     }
     @Override
     public Optional<Puzzle> getById(int id) {
+        Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
             return Optional.of(session.get(Puzzle.class, id));
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw e;
         }
     }
 
     @Override
     public Optional<Puzzle> getRandom(int elo) {
+        Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
             String hql = """
                     from Puzzle p
                     where p.rating - p.deviation <= :elo and :elo <= p.rating + p.deviation
@@ -38,13 +55,25 @@ public class PuzzleDaoImpl implements PuzzleDao {
                     .setMaxResults(1)
                     .getResultStream()
                     .findFirst();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw e;
         }
     }
 
     @Override
     public void delete(Puzzle puzzle) {
+        Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
             session.remove(puzzle);
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw e;
         }
     }
 }
